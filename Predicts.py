@@ -26,7 +26,7 @@ def conv2d(x, W):
 #reduce 2X2 and take largest of the pool
 def avg_pool_2x2(x):
   return tf.nn.avg_pool(x, ksize=[1, 2, 2, 1],
-                        strides=[1, 2, 2, 1], padding='SAME')
+						strides=[1, 2, 2, 1], padding='SAME')
 
 x = tf.placeholder(tf.float32, [None, 784]) #input
 y_ = tf.placeholder(tf.float32, [None, 10])
@@ -55,26 +55,26 @@ accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
 sess = tf.InteractiveSession()
 saver = tf.train.Saver()
-saver.restore(sess, "./neuralnetwork/model.ckpt")
+saver.restore(sess, "./neuralnetwork1/model.ckpt")
 
 import re
 numbers = re.compile(r'(\d+)')
 def numericalSort(value):
-    parts = numbers.split(value)
-    parts[1::2] = map(int, parts[1::2])
-    return parts
+	parts = numbers.split(value)
+	parts[1::2] = map(int, parts[1::2])
+	return parts
 
 with session.as_default():
-    output = open('predictions.txt', 'w')
-    with sess.as_default():
-      for image_path in sorted(glob.glob("./examples/*.png"), key=numericalSort):
-        image = misc.imread(image_path)
-        image = misc.imresize(image, (28, 28), interp="bicubic").astype(np.float32, casting='unsafe')
-        #checked shape is 28x28, checked type is float32
-        newX = np.reshape(image, (1,784))
-        prediction = tf.argmax(y_conv, 1)
-        p = prediction.eval(session = sess, feed_dict={x: newX, keep_prob: 1.0})
-        img_path = image_path.split("/")
-        p = str(p)
-        string = '{}\t{}\n'.format(img_path[2], p[1:-1])
-        output.write(string)
+	output = open('predictions1.txt', 'w')
+	with sess.as_default():
+	  	for image_path in sorted(glob.glob("./examples/*.png"), key=numericalSort):
+			image = misc.imread(image_path)
+			image = misc.imresize(image, (28, 28), interp="bicubic").astype(np.float32, casting='unsafe')
+			#checked shape is 28x28, checked type is float32
+			newX = np.reshape(image, (1,784))
+			prediction = tf.argmax(y_conv, 1)
+			p = prediction.eval(session = sess, feed_dict={x: newX, keep_prob: 1.0})
+			img_path = image_path.split("/")
+			p = str(p)
+			string = '{}\t{}\n'.format(img_path[2], p[1:-1])
+			output.write(string)
