@@ -55,7 +55,7 @@ accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
 sess = tf.InteractiveSession()
 saver = tf.train.Saver()
-saver.restore(sess, "./neuralnetwork2/model.ckpt")
+saver.restore(sess, "./neuralnetwork/model.ckpt")
 
 import re
 numbers = re.compile(r'(\d+)')
@@ -75,5 +75,6 @@ with session.as_default():
             prediction = tf.argmax(y_conv, 1)
             p = prediction.eval(session = sess, feed_dict={x: newX, keep_prob: 1.0})
             img_path = image_path.split("/")
-            string = '{}\t{}\n'.format(img_path[2], p)
+            p = str(p)
+            string = '{}\t{}\n'.format(img_path[2], p[1:-1])
             output.write(string)
