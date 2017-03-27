@@ -30,8 +30,8 @@ def bias_variable(shape):
 def conv2d(x, W):
   return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
 #reduce 2X2 and take largest of the pool
-def avg_pool_2x2(x):
-  return tf.nn.avg_pool(x, ksize=[1, 2, 2, 1],
+def max_pool_2x2(x):
+  return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],
                         strides=[1, 2, 2, 1], padding='SAME')
 
 x = tf.placeholder(tf.float32, [None, 784]) #input
@@ -50,7 +50,7 @@ x_image = tf.reshape(x, [-1,28,28,1])
 #hidden convolution layer
 h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
 #pull out info about features after 1st convolution
-h_pool1 = avg_pool_2x2(h_conv1)
+h_pool1 = max_pool_2x2(h_conv1)
 
 ### ---- SECOND LAYER ---- ###
 #weights and biases
@@ -59,7 +59,7 @@ b_conv2 = bias_variable([64])
 
 #hidden convolution
 h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
-h_pool2 = avg_pool_2x2(h_conv2)
+h_pool2 = max_pool_2x2(h_conv2)
 
 #
 W_fc1 = weight_variable([7 * 7 * 64, 1024])
@@ -94,7 +94,7 @@ saver = tf.train.Saver()
 ### ---- TRAIN THE MODEL AND SAVE THE NETWORK ---- ###
 with sess.as_default():
     sess.run(init_op)
-    for i in range(20000):
+    for i in range(10000):
         batch = mnist.train.next_batch(50)
         if i%100 == 0:
             train_accuracy = accuracy.eval(feed_dict={x:batch[0], y_: batch[1], keep_prob: 1.0})
