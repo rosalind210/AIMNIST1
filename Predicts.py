@@ -87,5 +87,6 @@ with session.as_default():
 
             #manipulate image_path name for presentation
 			img_path = image_path.split("/")
-			string = '{}\t{}\n'.format(img_path[2], p)
+			p = str(p)
+			string = '{}\t{}\n'.format(img_path[2], p[1:-1])
 			output.write(string)
