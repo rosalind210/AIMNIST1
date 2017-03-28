@@ -10,6 +10,8 @@ import glob
 import tensorflow as tf
 import numpy as np
 from scipy import misc
+from scipy.ndimage import morphology
+from PIL import Image
 session = tf.InteractiveSession();
 
 def weight_variable(shape):
@@ -57,7 +59,7 @@ accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
 sess = tf.InteractiveSession()
 saver = tf.train.Saver()
-saver.restore(sess, "./neuralnetwork-10k-avg/model.ckpt")
+saver.restore(sess, "./neuralnetwork-relu6/model.ckpt")
 
 import re
 numbers = re.compile(r'(\d+)')
@@ -74,6 +76,12 @@ with session.as_default():
 	with sess.as_default():
 	  	for image_path in sorted(glob.glob(folder_path+"*.png"), key=numericalSort):
 			image = misc.imread(image_path)
+
+			#threshold and dilate
+			#thresholded = image > 100 #arbitrary threshold value
+			#dilated = morphology.binary_dilation(thresholded)
+			#misc.toimage(dilated).show()
+
 			#pad original image to prevent distortions
 			height = image.shape[0]
 			width = image.shape[1]
@@ -84,6 +92,7 @@ with session.as_default():
 
             #resize for tensor input
 			image = misc.imresize(img, (28, 28), interp="bicubic").astype(np.float32, casting='unsafe')
+
 			newX = np.reshape(image, (1,784))
 
             #make prediction
