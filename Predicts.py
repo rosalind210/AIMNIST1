@@ -66,8 +66,7 @@ def numericalSort(value):
 
 with session.as_default():
 	output = open('predictions.txt', 'w')
-	print sys.argv[0]
-	folder_path = str(sys.argv[1])
+	folder_path = str(sys.argv[-1])
 	if not folder_path.endswith("/"):
 		folder_path +="/"
 	with sess.as_default():
