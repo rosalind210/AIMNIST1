@@ -55,7 +55,7 @@ accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
 sess = tf.InteractiveSession()
 saver = tf.train.Saver()
-saver.restore(sess, "./neuralnetwork/model.ckpt")
+saver.restore(sess, "./neuralnetwork-10k-avg/model.ckpt")
 
 import re
 numbers = re.compile(r'(\d+)')
@@ -66,8 +66,12 @@ def numericalSort(value):
 
 with session.as_default():
 	output = open('predictions.txt', 'w')
+	print sys.argv[0]
+	folder_path = str(sys.argv[1])
+	if not folder_path.endswith("/"):
+		folder_path +="/"
 	with sess.as_default():
-	  	for image_path in sorted(glob.glob("./examples/*.png"), key=numericalSort):
+	  	for image_path in sorted(glob.glob(folder_path+"*.png"), key=numericalSort):
 			image = misc.imread(image_path)
 			#pad original image to prevent distortions
 			height = image.shape[0]
@@ -88,5 +92,5 @@ with session.as_default():
             #manipulate image_path name for presentation
 			img_path = image_path.split("/")
 			p = str(p)
-			string = '{}\t{}\n'.format(img_path[2], p[1:-1])
+			string = '{}\t{}\n'.format(img_path[-1], p[1:-1])
 			output.write(string)
