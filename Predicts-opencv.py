@@ -9,6 +9,7 @@ import sys
 import glob
 import tensorflow as tf
 import numpy as np
+import cv2
 from scipy import misc
 session = tf.InteractiveSession();
 
@@ -55,7 +56,7 @@ accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
 sess = tf.InteractiveSession()
 saver = tf.train.Saver()
-saver.restore(sess, "./neuralnetwork/model.ckpt")
+saver.restore(sess, "./neuralnetwork-10k-max/model.ckpt")
 
 import re
 numbers = re.compile(r'(\d+)')
@@ -65,27 +66,19 @@ def numericalSort(value):
 	return parts
 
 with session.as_default():
-	output = open('predictions.txt', 'w')
+	output = open('predictions-max.txt', 'w')
 	with sess.as_default():
 	  	for image_path in sorted(glob.glob("./examples/*.png"), key=numericalSort):
+	  		image = cv2.imread(image_path,0) #black and white
+	  		cv2.imshow("f",image)
+	  		print(image.shape)
+	  		cv2.waitKey(22)
 			image = misc.imread(image_path)
-			#pad original image to prevent distortions
-			height = image.shape[0]
-			width = image.shape[1]
-			max_dim = max(height, width)
-			offset_height = max_dim - height
-			offset_width = max_dim - width
-			img = np.pad(image, ((offset_height/2, offset_height/2), (offset_width/2, offset_width/2)), 'constant')
-
-            #resize for tensor input
-			image = misc.imresize(img, (28, 28), interp="bicubic").astype(np.float32, casting='unsafe')
+			image = misc.imresize(image, (28, 28), interp="bicubic").astype(np.float32, casting='unsafe')
+			#checked shape is 28x28, checked type is float32
 			newX = np.reshape(image, (1,784))
-
-            #make prediction
 			prediction = tf.argmax(y_conv, 1)
 			p = prediction.eval(session = sess, feed_dict={x: newX, keep_prob: 1.0})
-
-            #manipulate image_path name for presentation
 			img_path = image_path.split("/")
 			p = str(p)
 			string = '{}\t{}\n'.format(img_path[2], p[1:-1])
