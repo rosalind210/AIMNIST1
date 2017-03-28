@@ -69,12 +69,23 @@ with session.as_default():
 	with sess.as_default():
 	  	for image_path in sorted(glob.glob("./examples/*.png"), key=numericalSort):
 			image = misc.imread(image_path)
-			image = misc.imresize(image, (28, 28), interp="bicubic").astype(np.float32, casting='unsafe')
-			#checked shape is 28x28, checked type is float32
-			newX = np.reshape(image, (1,784))
-			prediction = tf.argmax(y_conv, 1)
-			p = prediction.eval(session = sess, feed_dict={x: newX, keep_prob: 1.0})
-			img_path = image_path.split("/")
-			p = str(p)
-			string = '{}\t{}\n'.format(img_path[2], p[1:-1])
-			output.write(string)
+			#pad original image to prevent distortions
+           		height = image.shape[0]
+            		width = image.shape[1]
+            		max_dim = max(height, width)
+            		offset_height = max_dim - height
+            		offset_width = max_dim - width
+            		img = np.pad(image, ((offset_height/2, offset_height/2), (offset_width/2, offset_width/2)), 'constant')
+
+            		#resize for tensor input
+            		image = misc.imresize(img, (28, 28), interp="bicubic").astype(np.float32, casting='unsafe')
+            		newX = np.reshape(image, (1,784))
+
+            		#make prediction
+            		prediction = tf.argmax(y_conv, 1)
+            		p = prediction.eval(session = sess, feed_dict={x: newX, keep_prob: 1.0})
+
+            		#manipulate image_path name for presentation
+            		img_path = image_path.split("/")
+            		string = '{}\t{}\n'.format(img_path[2], p)
+            		output.write(string)
