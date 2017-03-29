@@ -61,20 +61,12 @@ b_conv2 = bias_variable([64])
 h_conv2 = tf.nn.relu6(conv2d(h_pool1, W_conv2) + b_conv2)
 h_pool2 = avg_pool_2x2(h_conv2)
 
-# ### ---- THIRD LAYER ---- ###
-# W_conv3 = weight_variable([5, 5, 64,128])
-# b_conv3 = bias_variable([128])
-#
-# h_conv3 = tf.nn.relu6(conv2d(h_pool2, W_conv3) + b_conv3)
-# h_pool3 = avg_pool_2x2(h_conv3)
-
-#
 W_fc1 = weight_variable([7 * 7 * 64, 1024])
 b_fc1 = bias_variable([1024])
 
 h_pool2_flat = tf.reshape(h_pool2, [-1, 7*7*64])
 
-h_fc1 = tf.nn.tanh(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
+h_fc1 = tf.nn.relu6(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
 
 ## DROPOUT - good for reducing overfitting ##
 keep_prob = tf.placeholder(tf.float32)
@@ -107,7 +99,7 @@ with sess.as_default():
             train_accuracy = accuracy.eval(feed_dict={x:batch[0], y_: batch[1], keep_prob: 1.0})
             print("step %d, training accuracy %g"%(i, train_accuracy))
         train_step.run(feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
-    save_path = saver.save(sess, "./neuralnetwork-tanh/model.ckpt")
+    save_path = saver.save(sess, "./neuralnetwork-relu6/model.ckpt")
     print("Model saved in file: %s" % save_path)
 
 
